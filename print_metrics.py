@@ -5,6 +5,9 @@ from fractions import Fraction
 import confusion_matrix
 # reference regarding formatting:  https://stackoverflow.com/questions/8234445/format-output-string-right-alignment
 
+TODO: implement additional metrics; from tabnet, consider adding: A few classic evaluation metrics are implemented (see further below for custom ones): binary classification metrics : 'auc', 'accuracy', 'balanced_accuracy', 'logloss'
+
+
 
 def print_metrics_from_cm(cm):
     # cm eq [[tn , fp],
