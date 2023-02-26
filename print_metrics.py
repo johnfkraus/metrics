@@ -100,7 +100,7 @@ def test_print_metrics_from_random_data():
     y_true = rand_generator.integers(0, num_classes, array_len)
     y_pred = rand_generator.integers(0, num_classes, array_len)
     print_array_data(y_true, y_pred)
-    cm = confusion_matrix.make_cm(y_true, y_pred)
+    cm = confusion_matrix.get_binary_confusion_matrix(y_true, y_pred)
     print_metrics_from_cm(cm)
 
 
@@ -108,7 +108,7 @@ def test_print_metrics_from_edge_case_zeros(array_len=20):
     # test value = 1 or 0; all values in the y_true and y_false will equal the test_val
     y_true = np.zeros(array_len, dtype=int)
     y_pred = np.zeros(array_len, dtype=int)
-    cm = confusion_matrix.make_cm(y_true, y_pred)
+    cm = confusion_matrix.get_binary_confusion_matrix(y_true, y_pred)
     make_cm_assertions(cm, array_len)
     print_metrics_from_cm(cm)   
 
@@ -116,7 +116,7 @@ def test_print_metrics_from_edge_case_zeros(array_len=20):
 def test_print_metrics_from_cm_edge_case_ones(array_len=20):
     y_true = np.ones(array_len, dtype=int)
     y_pred = np.ones(array_len, dtype=int)
-    cm = confusion_matrix.make_cm(y_true, y_pred)
+    cm = confusion_matrix.get_binary_confusion_matrix(y_true, y_pred)
     make_cm_assertions(cm, array_len)
     print_metrics_from_cm(cm)      
 
@@ -126,12 +126,19 @@ def make_cm_assertions(cm, array_len):
     assert(cm.size == 4)
 
 
-def test_print_metrics_from_arbitrary_input(test_val):
-    # sklearn.metrics import confusion_matrix breaks in the following cases, so we return a custom-made confusion matrix.
+def test_print_metrics_from_arbitrary_input():
     y_true = np.array(list([0,0,0,0,1,0]))
     y_pred = np.array(list([1,0,0,0,0,0]))
     print_array_data(y_true, y_pred)
-    cm = confusion_matrix.make_cm(y_true, y_pred)
+    cm = confusion_matrix.get_binary_confusion_matrix(y_true, y_pred)
+    make_cm_assertions(cm, y_true.size)
+    print_metrics_from_cm(cm) 
+
+def test_print_metrics_from_arbitrary_input(y_true, y_pred):
+    # y_true = np.array(list([0,0,0,0,1,0]))
+    # y_pred = np.array(list([1,0,0,0,0,0]))
+    print_array_data(y_true, y_pred)
+    cm = confusion_matrix.get_binary_confusion_matrix(y_true, y_pred)
     make_cm_assertions(cm, y_true.size)
     print_metrics_from_cm(cm) 
                
@@ -152,7 +159,7 @@ def test_make_cm_from_random_input(array_len=20):
     # return a confusion matrix (cm) from two numpy arrays; the arrays contain random ones or zeros
     y_true = make_random_test_array(array_len)
     y_pred = make_random_test_array(array_len)
-    cm = confusion_matrix.make_cm(y_true, y_pred)
+    cm = confusion_matrix.get_binary_confusion_matrix(y_true, y_pred)
     make_cm_assertions(cm, array_len)
     return cm
 
@@ -167,8 +174,19 @@ if __name__ == "__main__":
     print('>>>> running: test_print_metrics_from_cm_edge_case_ones(array_len=20)')
     test_print_metrics_from_cm_edge_case_ones(array_len=20)
 
+    # All false positives scenario
+    y_true = np.array(list([0,0,0,0,0,0]))
+    y_pred = np.array(list([1,1,1,1,1,1]))
+    test_print_metrics_from_arbitrary_input(y_true, y_pred)
 
-# compute and log classification model result metrics;
+    # All false negatives scenario
+    y_pred = np.array(list([0,0,0,0,0,0]))
+    y_true = np.array(list([1,1,1,1,1,1]))
+    test_print_metrics_from_arbitrary_input(y_true, y_pred)
+
+
+
+# compute and log classification model result metrics; work in process; TODO: evaluate
 from datetime import datetime
 
 def log_metrics_from_cm2(cm, random_seed_int, strat_rand_sample_duration_sum, clf_type="?", seed="?"):
